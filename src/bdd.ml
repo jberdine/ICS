@@ -181,6 +181,10 @@ module Make (Var : VAR) = struct
     assert (is_literal b) ;
     b.guard
 
+  (* CR: comment stale: subtrees aren't weighted differently *)
+  (* CR: why check is_const first, the first test of hash_node will do the
+     same thing *)
+
   (** Hash values are hashed, and negative hash slot incicates that the hash
       has not been computed. Hashs of subtrees are weighted differently so
       that bdds and the negation have different hashs. *)
@@ -593,8 +597,12 @@ module Make (Var : VAR) = struct
       else if is_false b1 then b3
       else if is_posvar b1 then build_var (to_var b1) b2 b3
       else if is_negvar b1 then build_var (to_var b1) b3 b2
-      else if is_false b2 && is_true b3 then
-        build_var b1.guard b1.neg b1.pos
+        (* else if is_false b2 && is_true b3 then
+         *   build_var b1.guard
+         *     (build b1.pos mk_false mk_true)
+         *     (build b1.neg mk_false mk_true) *)
+        (* else if is_false b2 && is_true b3 then
+         *   build_var b1.guard b1.neg b1.pos *)
       else if is_true b2 && is_posvar b3 then
         build_var (to_var b3) mk_true b1
       else if is_false b3 && is_posvar b2 then
@@ -707,8 +715,8 @@ module Make (Var : VAR) = struct
     else if is_false b then mk_true
     else
       let b' = mk_ite b mk_false mk_true in
-      assert (Check.neg "mk_neg" b b') ;
       assert (ordered b) ;
+      assert (Check.neg "mk_neg" b b') ;
       b'
 
   let mk_conj b1 b2 =
