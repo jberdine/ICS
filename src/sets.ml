@@ -47,6 +47,7 @@ module type S = sig
   val fold : (elt -> 'a -> 'a) -> t -> 'a -> 'a
   val for_all : (elt -> bool) -> t -> bool
   val exists : (elt -> bool) -> t -> bool
+  val find_map : (elt -> 'a option) -> t -> 'a option
   val cardinal : t -> int
   val to_list : t -> elt list
   val of_list : elt list -> t
@@ -94,6 +95,22 @@ module Balanced (Ord : OrderedType) : S with type elt = Ord.t = struct
   let min_elt s = S.min_elt s.root
   let max_elt s = S.max_elt s.root
   let choose s = S.choose s.root
+
+  exception Found
+
+  let find_map f s =
+    let res = ref None in
+    ( try
+        iter
+          (fun x ->
+            match f x with
+            | Some y ->
+                res := Some y ;
+                raise Found
+            | None -> () )
+          s
+      with Found -> () ) ;
+    !res
 
   exception Witness
 

@@ -111,6 +111,8 @@ module type S = sig
   (** [exists p s] checks if at least one element of the set satisfies the
       predicate [p]. *)
 
+  val find_map : (elt -> 'a option) -> t -> 'a option
+
   val cardinal : t -> int
   (** Return the number of elements of a set. *)
 
